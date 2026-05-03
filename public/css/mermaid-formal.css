@@ -1,0 +1,134 @@
+/* ===== Mermaid Diagram Formal Container ===== */
+
+.mermaid-wrapper {
+  margin: 24px 0;
+  padding: 28px 24px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  position: relative;
+  transition: background var(--transition), border var(--transition);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.mermaid-wrapper:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Label badge in top-left corner */
+.mermaid-wrapper::before {
+  content: 'DIAGRAM';
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+}
+
+/* Download SVG button in top-right */
+.mermaid-wrapper .mermaid-download {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity var(--transition);
+  padding: 4px 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+}
+
+.mermaid-wrapper:hover .mermaid-download {
+  opacity: 1;
+}
+
+.mermaid-wrapper .mermaid-download:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* SVG overrides for formal style */
+.mermaid-wrapper svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Override mermaid node styles for Notion-like formal look */
+.mermaid-wrapper .node rect,
+.mermaid-wrapper .node polygon,
+.mermaid-wrapper .node circle,
+.mermaid-wrapper .node ellipse {
+  stroke-width: 1.5px !important;
+}
+
+.mermaid-wrapper .edgePath path {
+  stroke-width: 1.5px !important;
+}
+
+/* Loading skeleton for mermaid */
+.mermaid-loading {
+  margin: 24px 0;
+  padding: 40px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.mermaid-loading__bar {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.mermaid-loading__bar:nth-child(1) { width: 60%; }
+.mermaid-loading__bar:nth-child(2) { width: 80%; }
+.mermaid-loading__bar:nth-child(3) { width: 40%; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Error state */
+.mermaid-error {
+  margin: 24px 0;
+  padding: 16px 20px;
+  background: rgba(235, 87, 87, 0.06);
+  border: 1px solid rgba(235, 87, 87, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--danger);
+  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+}
+
+.mermaid-error::before {
+  content: '⚠ Diagram Error';
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
