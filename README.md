@@ -49,7 +49,7 @@ Drop your Markdown files (or entire folders) and instantly view beautifully rend
 ### Option 1: npm
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/mermaiddoc.git
+git clone https://github.com/hongvincent/mermaiddoc.git
 cd mermaiddoc
 npm install
 npm start
@@ -59,7 +59,7 @@ npm start
 ### Option 2: Docker
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/mermaiddoc.git
+git clone https://github.com/hongvincent/mermaiddoc.git
 cd mermaiddoc
 docker-compose up -d
 # → http://localhost (port 80 via Nginx)
