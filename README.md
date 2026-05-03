@@ -11,6 +11,27 @@
 
 Drop your Markdown files (or entire folders) and instantly view beautifully rendered documents with **clean, formal Mermaid diagrams** — straight orthogonal lines, neutral palettes, and Inter typography — just like Notion.
 
+---
+
+## 🗺️ User Workflow
+
+```mermaid
+graph TD
+    A[Start: Open MermaidDoc] --> B{Input Method}
+    B -->|Drag & Drop| C[Drop MD Files or Folders]
+    B -->|Browse| D[Select Files from System]
+    C --> E[Recursive Folder Scan]
+    D --> F[Add to File Queue]
+    E --> F
+    F --> G[Select File from Sidebar]
+    G --> H[Markdown & Mermaid Rendering]
+    H --> I{Interactions}
+    I -->|Theme| J[Toggle Light/Dark Mode]
+    I -->|Export| K[Download SVG]
+    I -->|Output| L[Print / Save as PDF]
+    J --> H
+```
+
 </div>
 
 ---
