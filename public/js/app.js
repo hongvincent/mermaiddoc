@@ -93,11 +93,12 @@ const MermaidDocApp = (() => {
       localStorage.setItem('mermaiddoc-theme', next);
 
       // Re-render mermaid with new theme colors
-      MermaidDocRenderer.reinitMermaid();
       const viewerContent = document.getElementById('viewer-content');
       const viewer = document.getElementById('viewer');
       if (!viewer.hidden) {
-        MermaidDocRenderer.renderMermaidBlocks(viewerContent);
+        MermaidDocRenderer.reinitMermaid(viewerContent);
+      } else {
+        MermaidDocRenderer.reinitMermaid();
       }
     });
   }

@@ -39,9 +39,10 @@ const MermaidDocRenderer = (() => {
         const code = token.content.trim();
         const id = `mermaid-block-${++renderCounter}`;
         // Wrap in our container; actual rendering happens after DOM insertion
+        // Store code in data-code for re-rendering during theme changes
         return `
           <div class="mermaid-wrapper" id="${id}-wrapper">
-            <pre class="mermaid" id="${id}">${escapeHtml(code)}</pre>
+            <pre class="mermaid" id="${id}" data-code="${escapeHtml(code)}">${escapeHtml(code)}</pre>
             <button class="mermaid-download" data-target="${id}" title="Download SVG">⬇ SVG</button>
           </div>`;
       }
@@ -76,63 +77,63 @@ const MermaidDocRenderer = (() => {
         messageMargin: 40,
       },
       themeVariables: isDark ? {
-        primaryColor: '#353535',
-        primaryTextColor: '#E8E8E8',
-        primaryBorderColor: '#5A5A5A',
-        lineColor: '#7A7A7A',
-        secondaryColor: '#2A2A2A',
-        tertiaryColor: '#323232',
-        mainBkg: '#353535',
-        nodeBorder: '#5A5A5A',
-        clusterBkg: '#2A2A2A',
-        clusterBorder: '#444444',
-        titleColor: '#E8E8E8',
-        edgeLabelBackground: '#252525',
-        noteBkgColor: '#353535',
-        noteTextColor: '#E8E8E8',
-        noteBorderColor: '#5A5A5A',
-        actorBkg: '#353535',
-        actorTextColor: '#E8E8E8',
-        actorBorder: '#5A5A5A',
-        actorLineColor: '#7A7A7A',
-        signalColor: '#E8E8E8',
-        signalTextColor: '#E8E8E8',
-        labelBoxBkgColor: '#353535',
-        labelBoxBorderColor: '#5A5A5A',
-        labelTextColor: '#E8E8E8',
-        loopTextColor: '#E8E8E8',
-        activationBorderColor: '#7A7A7A',
-        activationBkgColor: '#404040',
-        sequenceNumberColor: '#E8E8E8',
+        primaryColor: '#2F2F2F',
+        primaryTextColor: '#E3E3E0',
+        primaryBorderColor: '#444444',
+        lineColor: '#888888',
+        secondaryColor: '#252525',
+        tertiaryColor: '#2F2F2F',
+        mainBkg: '#2F2F2F',
+        nodeBorder: '#444444',
+        clusterBkg: '#1F1F1F',
+        clusterBorder: '#37352F',
+        titleColor: '#E3E3E0',
+        edgeLabelBackground: '#191919',
+        noteBkgColor: '#2F2F2F',
+        noteTextColor: '#E3E3E0',
+        noteBorderColor: '#444444',
+        actorBkg: '#2F2F2F',
+        actorTextColor: '#E3E3E0',
+        actorBorder: '#444444',
+        actorLineColor: '#888888',
+        signalColor: '#E3E3E0',
+        signalTextColor: '#E3E3E0',
+        labelBoxBkgColor: '#2F2F2F',
+        labelBoxBorderColor: '#444444',
+        labelTextColor: '#E3E3E0',
+        loopTextColor: '#E3E3E0',
+        activationBorderColor: '#888888',
+        activationBkgColor: '#3F3F3F',
+        sequenceNumberColor: '#E3E3E0',
         fontFamily: '"Inter", sans-serif',
       } : {
-        primaryColor: '#FFFFFF',
+        primaryColor: '#F7F7F5',
         primaryTextColor: '#37352F',
-        primaryBorderColor: '#D4D4D0',
-        lineColor: '#B0AFA8',
-        secondaryColor: '#F5F5F4',
-        tertiaryColor: '#FAFAF9',
-        mainBkg: '#FFFFFF',
-        nodeBorder: '#D4D4D0',
-        clusterBkg: '#FAFAF9',
+        primaryBorderColor: '#E3E3E0',
+        lineColor: '#999999',
+        secondaryColor: '#FBFBFA',
+        tertiaryColor: '#FFFFFF',
+        mainBkg: '#F7F7F5',
+        nodeBorder: '#E3E3E0',
+        clusterBkg: '#FBFBFA',
         clusterBorder: '#E3E3E0',
         titleColor: '#37352F',
         edgeLabelBackground: '#FFFFFF',
         noteBkgColor: '#FEFCE8',
         noteTextColor: '#37352F',
         noteBorderColor: '#E3E3E0',
-        actorBkg: '#FFFFFF',
+        actorBkg: '#F7F7F5',
         actorTextColor: '#37352F',
-        actorBorder: '#D4D4D0',
-        actorLineColor: '#B0AFA8',
+        actorBorder: '#E3E3E0',
+        actorLineColor: '#999999',
         signalColor: '#37352F',
         signalTextColor: '#37352F',
-        labelBoxBkgColor: '#FFFFFF',
-        labelBoxBorderColor: '#D4D4D0',
+        labelBoxBkgColor: '#F7F7F5',
+        labelBoxBorderColor: '#E3E3E0',
         labelTextColor: '#37352F',
         loopTextColor: '#37352F',
-        activationBorderColor: '#D4D4D0',
-        activationBkgColor: '#F5F5F4',
+        activationBorderColor: '#E3E3E0',
+        activationBkgColor: '#F1F1EF',
         sequenceNumberColor: '#37352F',
         fontFamily: '"Inter", sans-serif',
       },
@@ -158,8 +159,23 @@ const MermaidDocRenderer = (() => {
     const blocks = container.querySelectorAll('pre.mermaid');
     if (blocks.length === 0) return;
 
+    // Reset blocks for re-rendering if they were already processed
+    blocks.forEach(block => {
+      if (block.getAttribute('data-processed')) {
+        block.removeAttribute('data-processed');
+        const originalCode = block.getAttribute('data-code');
+        if (originalCode) {
+          block.textContent = originalCode;
+          block.innerHTML = escapeHtml(originalCode);
+        }
+      }
+    });
+
     try {
-      await window.mermaid.run({ nodes: blocks });
+      await window.mermaid.run({ 
+        nodes: blocks,
+        suppressErrors: true
+      });
     } catch (err) {
       console.error('Mermaid render error:', err);
       // Mark failed blocks with error state
@@ -202,9 +218,12 @@ const MermaidDocRenderer = (() => {
   /**
    * Re-initialize mermaid (e.g., after theme change)
    */
-  function reinitMermaid() {
+  async function reinitMermaid(container) {
     mermaidReady = false;
     initMermaid();
+    if (container) {
+      await renderMermaidBlocks(container);
+    }
   }
 
   /* ---- Helpers ---- */
